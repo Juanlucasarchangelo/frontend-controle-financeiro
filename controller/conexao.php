@@ -10,7 +10,7 @@ if($bd ==1){
 } else {
     define('HOST', 'localhost');
     define('USUARIO', 'root');
-    define('SENHA', '');
+    define('SENHA', 'root');
     define('DB', 'sistema');
 }
 

@@ -1,42 +1,124 @@
 <?php
 require_once('../model/class.info.php');
+require_once "../model/class.info.php";
 class ControllerInfo
 {
     private $obj;
     function __construct()
     {
-        $this->obj = new Info();
+        $this->obj = new TransacaoModel();
         $this->obj->conexao();
     }
 
-    public function getTodosFunc()
+    function formatarReal($valor): string
     {
-        $this->obj->conexao();
-        $this->obj->getInfo();//Info
+        return 'R$ ' . number_format((float) $valor, 2, ',', '.');
     }
 
-    public function setInfo($camp1, $camp2, $camp3, $camp4, $camp5, $camp6, $camp7, $camp8, $camp9, $camp10, $camp11, $camp12, $camp13, $camp14, $camp15, $camp16, $camp17, $camp18, $camp19, $camp20, $camp21, $camp22, $camp23, $camp24)//Info
+    function formatarData($data): string
     {
-        $this->obj->insertInfo($camp1, $camp2, $camp3, $camp4, $camp5);
+        return date('d/m/Y', strtotime($data));
     }
-    public function updateInfo($id_camp, $camp1, $camp2, $camp3, $camp4, $camp5, $camp6, $camp7, $camp8, $camp9, $camp10, $camp11, $camp12, $camp13, $camp14, $camp15, $camp16, $camp17, $camp18, $camp19, $camp20, $camp21, $camp22, $camp23, $camp24)
-    {
-        $this->obj->updateInfo($id_camp, $camp1, $camp2, $camp3, $camp4, $camp5, $camp6, $camp7, $camp8, $camp9, $camp10, $camp11, $camp12, $camp13, $camp14, $camp15, $camp16, $camp17, $camp18, $camp19, $camp20, $camp21, $camp22, $camp23, $camp24);
-    }
-    public function deleteInfo($id_camp)
-    {
-        $this->obj->delete_Info($id_camp);
-    }
-}
-$objControl = new ControllerInfo();
-if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == "POST") {
-    if (isset($_POST['_incluir']) && $_POST['_incluir'] == "_incluir") {
-        $objControl->setInfo($_POST['camp1'], $_POST['camp2'], $_POST['camp3'], $_POST['camp4'], $_POST['camp5'], $_POST['camp6'], $_POST['camp7'], $_POST['camp8'], $_POST['camp9'], $_POST['camp10'], $_POST['camp11'], $_POST['camp12'], $_POST['camp13'], $_POST['camp14'], $_POST['camp15'], $_POST['camp16'], $_POST['camp17'], $_POST['camp18'], $_POST['camp19'], $_POST['camp20'], $_POST['camp21'], $_POST['camp22'], $_POST['camp23'], $_POST['camp24']);
 
-    } else if (isset($_POST['_update']) && $_POST['_update'] == "_update") {
-        $objControl->updateInfo($_POST['id_camp'], $_POST['camp1'], $_POST['camp2'], $_POST['camp3'], $_POST['camp4'], $_POST['camp5'], $_POST['camp6'], $_POST['camp7'], $_POST['camp8'], $_POST['camp9'], $_POST['camp10'], $_POST['camp11'], $_POST['camp12'], $_POST['camp13'], $_POST['camp14'], $_POST['camp15'], $_POST['camp16'], $_POST['camp17'], $_POST['camp18'], $_POST['camp19'], $_POST['camp20'], $_POST['camp21'], $_POST['camp22'], $_POST['camp23'], $_POST['camp24']);
+
+    public function getTransacoes()
+    {
+        $ch = curl_init();
+        $url = 'http://localhost:5069/api/listar-transacoes';
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $resposta = curl_exec($ch);
+
+        if ($resposta === false) {
+            curl_close($ch);
+            return [];
+        }
+
+        curl_close($ch);
+
+        return json_decode($resposta, true);
+    }
+
+    public function getResumo()
+    {
+        $ch = curl_init();
+        $url = 'http://localhost:5069/api/listar-resumo';
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $resposta = curl_exec($ch);
+
+        if ($resposta === false) {
+            curl_close($ch);
+            return [];
+        }
+
+        curl_close($ch);
+
+        return json_decode($resposta, true);
+    }
+
+    public function updateTransacao($id, $descricao, $valor, $observacoes   )
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
+            if ($_POST['acao'] === 'updateTransacao') {
+                $id = $_POST['id'];
+                $descricao = $_POST['descricao'];
+                $valor = $_POST['valor'];
+                $observacao = $_POST['observacoes'];
+
+                $resultado = $this->updateTransacaoApi($id, $descricao, $valor, $observacao);
+
+                if (isset($resultado['erro'])) {
+                    echo "Erro ao atualizar: " . $resultado['erro'];
+                } else {
+                    header("Location: ../view/painel.php?msg=Transação atualizada com sucesso");
+                    exit;
+                }
+            }
+        }
+    }
+
+    public function updateTransacaoApi($id, $descricao, $valor, $observacao)
+    {
+        $ch = curl_init();
+
+        $url = "http://localhost:5069/api/transacoes/editar-transacoes/{$id}";
+
+        $payload = json_encode([
+            "id" => $id,
+            "descricao" => $descricao,
+            "valor" => $valor,
+            "observacao" => $observacao
+        ]);
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($payload)
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $resposta = curl_exec($ch);
+
+        if ($resposta === false) {
+            $erro = curl_error($ch);
+            curl_close($ch);
+            return ["erro" => $erro];
+        }
+
+        curl_close($ch);
+
+        return json_decode($resposta, true);
     }
 }
-if (isset($_GET['id_camp'])) {
-    $objControl->deleteInfo($_GET['id_camp']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'updateTransacao') {
+    $controller = new ControllerInfo();
+    $controller->updateTransacao($_POST['id'], $_POST['descricao'], $_POST['valor'], $_POST['observacao']);
 }
