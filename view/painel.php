@@ -11,7 +11,7 @@ if (!$_SESSION['usuario']) {
 $objControllerFunc = new controllerInfo();
 $transacoes = $objControllerFunc->getTransacoes();
 $resumos = $objControllerFunc->getResumo();
-
+$categorias = $objControllerFunc->getCategorias();
 ?>
 
 <!DOCTYPE html>
@@ -34,25 +34,15 @@ $resumos = $objControllerFunc->getResumo();
 </head>
 
 <body style="background-color: #e6e6e6">
-
-  <!-- M e n u - e - L o g o -->
-
   <nav class="navbar navbar-expand-md navbar-light shadow p-3 bg-white">
-
-    <!-- L o g o t i p o -->
-
     <div class="container">
       <a class="navbar-brand text-primary" href="painel.php">
         <img src="https://mgcontecnica.com.br/wp-content/uploads/2025/04/logo-site-novo.png" width="100px" height="100px" class="">
         <b></b>
       </a>
-
       <button class="navbar-toggler navbar-toggler-right border-0" type="button" data-toggle="collapse" data-target="#navbar4">
         <span class="navbar-toggler-icon"></span>
       </button>
-
-      <!-- M e n u - E s c r i t o -->
-
       <div class="collapse navbar-collapse" id="navbar4">
         <ul class="navbar-nav ml-auto font-weight-bold">
           <li class="nav-item">
@@ -61,18 +51,12 @@ $resumos = $objControllerFunc->getResumo();
           <li class="nav-item">
             <a class="nav-link" href="cadastroinfo.php">Cadastro</a>
           </li>
-
-          <!--Mudar Botão Login -->
-
           <li class="nav-item">
             <a class="nav-link bg-danger text-light" href="../controller/logout.php">SAIR</a>
           </li>
-
       </div>
     </div>
   </nav>
-
-  <!-- Informações do Cliente -->
   <div class="container-fluid">
     <div class="row">
       <div class="col-xl-3 col-lg-5 col-sm-12 bg-ligth shadow-lg p-3 mb-5 rounded text-center">
@@ -85,15 +69,10 @@ $resumos = $objControllerFunc->getResumo();
           <div class="card-body">';
         }
         ?>
-
         <h3>Usuário Logado:</h3>
-
         <h6 class="lead"><strong><?php echo $_SESSION['usuario']; ?></strong></h6>
       </div>
     </div>
-
-    <!-- Area de listagem-->
-
     <div class="col-xl-9 col-lg-8 col-sm-12 card bg-light shadow-lg p-3 mb-5 rounded">
       <div class="row g-2">
         <div class="col-9 card">
@@ -116,7 +95,6 @@ $resumos = $objControllerFunc->getResumo();
                   <td><?= $objControllerFunc->formatarReal($transacao['valor']) ?></td>
                   <td><?= $objControllerFunc->formatarData($transacao['data']) ?></td>
                   <td>
-                    <!-- Botão abre modal único -->
                     <a href="#editarTransacao<?= $transacao['id'] ?>"
                       data-bs-toggle="modal"
                       data-bs-target="#editarTransacao<?= $transacao['id'] ?>"
@@ -140,27 +118,24 @@ $resumos = $objControllerFunc->getResumo();
                           <h1 class="modal-title fs-5" id="editarTransacaoLabel<?= $transacao['id'] ?>">Editar Transação</h1>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-
                         <div class="modal-body">
-                          <!-- id hidden -->
                           <input type="hidden" name="id" value="<?= $transacao['id'] ?>">
+                          <input type="hidden" name="data" value="<?= $transacao['data'] ?>">
+                          <input type="hidden" name="categoriaId" value="<?= $transacao['categoriaId'] ?>">
+                          <input type="hidden" name="dataCriacao" value="<?= $transacao['dataCriacao'] ?>">
                           <div class="mb-3">
                             <label for="descricao<?= $transacao['id'] ?>" class="form-label">Descrição</label>
-                            <input type="text" class="form-control" id="descricao<?= $transacao['id'] ?>" name="descricao" value="<?= $transacao['descricao'] ?>" required>
+                            <input type="text" class="form-control" id="descricao" name="descricao" value="<?= $transacao['descricao'] ?>" required>
                           </div>
-
                           <div class="mb-3">
                             <label for="valor<?= $transacao['id'] ?>" class="form-label">Valor</label>
-                            <input type="text" class="form-control" id="valor<?= $transacao['id'] ?>" name="valor" value="<?= $transacao['valor'] ?>" required>
+                            <input type="text" class="form-control" id="valor" name="valor" value="<?= $transacao['valor'] ?>" required>
                           </div>
-
                           <div class="mb-3">
                             <label for="observacoes<?= $transacao['id'] ?>" class="form-label">Observações</label>
-                            <textarea class="form-control" id="observacoes<?= $transacao['id'] ?>" name="observacoes"><?= $transacao['observacoes'] ?? '' ?></textarea>
-
+                            <textarea class="form-control" id="observacoes" name="observacoes"><?= $transacao['observacoes'] ?? '' ?></textarea>
                           </div>
                         </div>
-
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                           <button type="submit" name="acao" value="updateTransacao" class="btn btn-primary">Salvar alterações</button>
@@ -172,7 +147,6 @@ $resumos = $objControllerFunc->getResumo();
               <?php } ?>
             </tbody>
           </table>
-
         </div>
         <div class="col-3 card">
           <h4 class="text-left pt-3 pb-3">Resumo Financeiro</h4>
@@ -221,7 +195,7 @@ $resumos = $objControllerFunc->getResumo();
         .then(response => {
           if (response.ok) {
             alert("Transação excluída com sucesso!");
-            location.reload(); // Recarrega página
+            location.reload();
           } else {
             alert("Erro ao excluir transação.");
           }

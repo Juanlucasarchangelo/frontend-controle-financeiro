@@ -41,6 +41,26 @@ class ControllerInfo
         return json_decode($resposta, true);
     }
 
+    public function getCategorias()
+    {
+        $ch = curl_init();
+        $url = 'http://localhost:5069/api/listar-categorias';
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $resposta = curl_exec($ch);
+
+        if ($resposta === false) {
+            curl_close($ch);
+            return [];
+        }
+
+        curl_close($ch);
+
+        return json_decode($resposta, true);
+    }
+
     public function getResumo()
     {
         $ch = curl_init();
@@ -61,64 +81,67 @@ class ControllerInfo
         return json_decode($resposta, true);
     }
 
-    public function updateTransacao($id, $descricao, $valor, $observacoes   )
+    public function updateTransacao()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
-            if ($_POST['acao'] === 'updateTransacao') {
-                $id = $_POST['id'];
-                $descricao = $_POST['descricao'];
-                $valor = $_POST['valor'];
-                $observacao = $_POST['observacoes'];
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'updateTransacao') {
+            $id          = $_POST['id'];
+            $descricao   = $_POST['descricao'];
+            $valor       = $_POST['valor'];
+            $observacoes = $_POST['observacoes'];
+            $data        = $_POST['data'];
+            $categoriaId = $_POST['categoriaId'];
+            $dataCriacao = $_POST['dataCriacao'];
 
-                $resultado = $this->updateTransacaoApi($id, $descricao, $valor, $observacao);
+            $url = "http://localhost:5069/api/editar-transacoes/{$id}";
 
-                if (isset($resultado['erro'])) {
-                    echo "Erro ao atualizar: " . $resultado['erro'];
-                } else {
-                    header("Location: ../view/painel.php?msg=Transação atualizada com sucesso");
-                    exit;
-                }
+            $payload = json_encode([
+                "id"          => (int) $id,
+                "descricao"   => $descricao,
+                "valor"       => (float) $valor,
+                "data"        => $data,
+                "categoriaId" => (int) $categoriaId,
+                "observacoes" => $observacoes,
+                "dataCriacao" => $dataCriacao,
+                "categoria"   => [
+                    "id"    => (int) $categoriaId,
+                    "nome"  => "string",   
+                    "tipo"  => "string",
+                    "ativo" => true
+                ]
+            ]);
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($payload)
+            ]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            $resposta = curl_exec($ch);
+
+            if ($resposta === false) {
+                $erro = curl_error($ch);
+                curl_close($ch);
+                die("Erro ao atualizar: " . $erro);
             }
-        }
-    }
 
-    public function updateTransacaoApi($id, $descricao, $valor, $observacao)
-    {
-        $ch = curl_init();
-
-        $url = "http://localhost:5069/api/transacoes/editar-transacoes/{$id}";
-
-        $payload = json_encode([
-            "id" => $id,
-            "descricao" => $descricao,
-            "valor" => $valor,
-            "observacao" => $observacao
-        ]);
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Content-Length: ' . strlen($payload)
-        ]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $resposta = curl_exec($ch);
-
-        if ($resposta === false) {
-            $erro = curl_error($ch);
             curl_close($ch);
-            return ["erro" => $erro];
+
+            $resultado = json_decode($resposta, true);
+
+            if (isset($resultado['erro'])) {
+                die("Erro ao atualizar: " . $resultado['erro']);
+            }
+
+            // sucesso
+            header("Location: ../view/painel.php?msg=Transação atualizada com sucesso");
+            exit;
         }
-
-        curl_close($ch);
-
-        return json_decode($resposta, true);
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'updateTransacao') {
-    $controller = new ControllerInfo();
-    $controller->updateTransacao($_POST['id'], $_POST['descricao'], $_POST['valor'], $_POST['observacao']);
-}
+$objControllerFunc = new controllerInfo();
+$objControllerFunc->updateTransacao();
