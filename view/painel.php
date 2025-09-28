@@ -20,7 +20,7 @@ $categorias = $objControllerFunc->getCategorias();
 
 <head>
   <meta charset="utf-8">
-  <title>Sistema - Click</title>
+  <title>Sistema - Controle Financeiro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foΩΩ-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -76,7 +76,19 @@ $categorias = $objControllerFunc->getCategorias();
     <div class="col-xl-9 col-lg-8 col-sm-12 card bg-light shadow-lg p-3 mb-5 rounded">
       <div class="row g-2">
         <div class="col-9 card">
-          <h4 class="text-left pt-3 pb-3">Transações</h4>
+          <div class="row">
+            <div class="col-6">
+              <h4 class="text-left pt-3 pb-3">Transações</h4>
+            </div>
+            <div class="col-6 d-flex align-items-center justify-content-end">
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#adicionarTransacao">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
+                </svg>
+                Adicionar
+              </button>
+            </div>
+          </div>
           <table class="table table-striped">
             <thead>
               <tr>
@@ -173,6 +185,65 @@ $categorias = $objControllerFunc->getCategorias();
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="adicionarTransacao" tabindex="-1" aria-labelledby="adicionarTransacaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="../controller/controllerInfo.php" method="POST">
+          <div class="modal-header">
+            <h5 class="modal-title" id="adicionarTransacaoLabel">Adicionar Transação</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="acao" value="createTransacao">
+
+            <div class="mb-3">
+              <label for="descricao" class="form-label">ID</label>
+              <input type="text" class="form-control" name="id" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="descricao" class="form-label">Descrição</label>
+              <input type="text" class="form-control" name="descricao" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="valor" class="form-label">Valor (R$)</label>
+              <input type="number" step="0.01" class="form-control" name="valor" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="data" class="form-label">Data</label>
+              <input type="datetime-local" class="form-control" name="data" value="<?= date('Y-m-d\TH:i') ?>" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="dataCriacao" class="form-label">Data Criação</label>
+              <input type="datetime-local" class="form-control" name="dataCriacao" value="<?= date('Y-m-d\TH:i') ?>" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="categoriaId" class="form-label">Categoria</label>
+              <select class="form-select" name="categoriaId" required>
+                <?php foreach ($categorias as $categoria): ?>
+                  <option value="<?= $categoria['id'] ?>"><?= $categoria['nome'] ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="observacoes" class="form-label">Observações</label>
+              <textarea class="form-control" name="observacoes"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

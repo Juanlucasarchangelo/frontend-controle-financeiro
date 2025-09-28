@@ -81,6 +81,53 @@ class ControllerInfo
         return json_decode($resposta, true);
     }
 
+    public function createTransacao()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'createTransacao') {
+            $id          = $_POST['id'] ?? 0;
+            $descricao   = $_POST['descricao'] ?? '';
+            $valor       = $_POST['valor'] ?? 0;
+            $observacoes = $_POST['observacoes'] ?? '';
+            $data        = $_POST['data'] ?? date('c'); // ISO 8601
+            $categoriaId = $_POST['categoriaId'] ?? 0;
+            $dataCriacao = $_POST['dataCriacao'] ?? date('c');
+    
+            $url = "http://localhost:5069/api/cadastrar-transacoes";
+    
+            $payload = json_encode([
+                "id"          => (int) $id,
+                "descricao"   => $descricao,
+                "valor"       => (float) $valor,
+                "data"        => $data,
+                "categoriaId" => (int) $categoriaId,
+                "observacoes" => $observacoes,
+                "dataCriacao" => $dataCriacao,
+            ], JSON_PRETTY_PRINT);
+    
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST"); // <- troquei para POST
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($payload)
+            ]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+            $resposta = curl_exec($ch);
+    
+            if ($resposta === false) {
+                die("Erro cURL: " . curl_error($ch));
+            }
+    
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+    
+            header("Location: ../view/painel.php?msg=Transação criada com sucesso");
+            exit;
+        }
+    }    
+
     public function updateTransacao()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'updateTransacao') {
@@ -104,7 +151,7 @@ class ControllerInfo
                 "dataCriacao" => $dataCriacao,
                 "categoria"   => [
                     "id"    => (int) $categoriaId,
-                    "nome"  => "string",   
+                    "nome"  => "string",
                     "tipo"  => "string",
                     "ativo" => true
                 ]
@@ -145,3 +192,4 @@ class ControllerInfo
 
 $objControllerFunc = new controllerInfo();
 $objControllerFunc->updateTransacao();
+$objControllerFunc->createTransacao();
