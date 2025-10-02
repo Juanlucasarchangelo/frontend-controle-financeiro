@@ -49,9 +49,6 @@ $categorias = $objControllerFunc->getCategorias();
             <a class="nav-link" href="painel.php">Inicio</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="cadastroinfo.php">Cadastro</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link bg-danger text-light" href="../controller/logout.php">SAIR</a>
           </li>
       </div>

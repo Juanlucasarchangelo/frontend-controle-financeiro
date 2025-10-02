@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://media.giphy.com/media/Ll22OhMLAlVDb8UQWe/giphy.gif" width="120"/>
+  <img src="https://archania.com.br/wp-content/uploads/2024/10/archania-solum-favicon-branco.png" width="120"/>
     <h1>🛠 Sistema de Controle Financeiro Empresarial</h1>
   <p>Sistema desenvolvido para controlar receitas e despesas de uma pequena empresa, com categorização de transações e relatórios básicos.</p>
 
@@ -21,8 +21,7 @@
 
 ## ✨ Demonstração
 
-<p>Em breve... </p>
-<!-- <img src="https://user-images.githubusercontent.com/xxx/preview.gif" width="100%" alt="preview do projeto"/> -->
+<img src="https://archania.com.br/wp-content/uploads/2025/10/sistema-financeiro.png" width="100%" alt="preview do projeto"/>
 
 ---
 
@@ -38,20 +37,50 @@
 
 ---
 
-## 📦 Instalação
+## ⚙️ Pré-requisitos
 
-```bash
-# Clone o repositório
-git clone https://github.com/seuusuario/nome-do-projeto.git
+Antes de rodar o projeto, você precisa ter instalado:
 
-# Acesse o diretório
-cd nome-do-projeto
+- [XAMPP 7.4](https://www.apachefriends.org/pt_br/index.html)
+- [MySQL Server](https://dev.mysql.com/downloads/mysql/)
+- [Visual Studio Code](https://code.visualstudio.com/) ou [Visual Studio](https://visualstudio.microsoft.com/) (opcional)
 
-# Instale as dependências (exemplo Laravel)
-composer install
-npm install
+---
 
-# Configure o .env
-cp .env.example .env
-php artisan key:generate
-```
+## 🚀 Como rodar o projeto
+
+1. Clone o repositório dentro da sua pasta htdocs:
+
+   ```bash
+   git clone https://github.com/Juanlucasarchangelo/frontend-controle-financeiro
+   cd frontend-controle-financeiro
+   ```
+
+2. Importe o banco de dados:
+
+   Na raiz do projeto, existe uma pasta chamada **@BD** que contém um arquivo `.sql` já populado com dados de teste.  
+   
+   **Credenciais padrão para acesso:**
+   - **Usuário:** `adm@adm.com.br`  
+   - **Senha:** `@adm2025`
+
+3. Configure a conexão com o banco nos arquivos `model/init.php` e `controller/conexao.php`:
+
+   ```php
+   if ($bd == 1) { // Dados em produção
+       define('BD_SERVIDOR', 'localhost');
+       define('BD_USUARIO', '');
+       define('BD_SENHA', '');
+       define('BD_BANCO', '');
+   } else { // Dados local
+       define('BD_SERVIDOR', 'localhost');
+       define('BD_USUARIO', 'root');
+       define('BD_SENHA', 'root');
+       define('BD_BANCO', 'sistema');
+   }
+
+4. Inicie o Apache no XAMPP:
+
+   - Abra o **XAMPP Control Panel** e inicie o serviço **Apache**.  
+   - Em seguida, acesse no navegador:  
+     👉 [http://127.0.0.1/frontend-controle-financeiro/](http://127.0.0.1/frontend-controle-financeiro/)

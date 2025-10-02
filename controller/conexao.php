@@ -3,17 +3,17 @@
 $bd = 0;
 
 if($bd ==1){
-    define('HOST', 'localhost');
-    define('USUARIO', 'clickm67_user');
-    define('SENHA', 'Click123@mkt');
-    define('DB', 'clickm67_sistema');
+    define('BD_SERVIDOR', 'localhost');
+    define('BD_USUARIO', '');
+    define('BD_SENHA', '');
+    define('BD_BANCO', '');
 } else {
-    define('HOST', 'localhost');
-    define('USUARIO', 'root');
-    define('SENHA', 'root');
-    define('DB', 'sistema');
+    define('BD_SERVIDOR', 'localhost');
+    define('BD_USUARIO', 'root');
+    define('BD_SENHA', 'root');
+    define('BD_BANCO', 'sistema');
 }
 
-$conexao = mysqli_connect(HOST, USUARIO, SENHA, DB) or die('Não foi possivel conectar!');
+$conexao = mysqli_connect(BD_SERVIDOR, BD_USUARIO, BD_SENHA, BD_BANCO) or die('Não foi possivel conectar!');
 
 ?>
